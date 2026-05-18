@@ -30,28 +30,28 @@ Password: Admin@123
 ## 📸 Screenshots
 
 ### Login Page
-![Login Page](./screenshots/login.png)
+![Login Page](https://github.com/Dutta-Raj/Smart_leads-/blob/main/Screenshot%202026-05-18%20165908.png)
 
 ### Registration Page
-![Registration Page](./screenshots/register.png)
+![Registration Page](https://github.com/Dutta-Raj/Smart_leads-/blob/main/Screenshot%202026-05-18%20170004.png)
 
 ### Dashboard - Light Mode
-![Dashboard Light](./screenshots/dashboard-light.png)
+![Dashboard Light](https://github.com/Dutta-Raj/Smart_leads-/blob/main/Screenshot%202026-05-18%20170052.png)
 
 ### Dashboard - Dark Mode
-![Dashboard Dark](./screenshots/dashboard-dark.png)
+![Dashboard Dark](https://github.com/Dutta-Raj/Smart_leads-/blob/main/Screenshot%202026-05-18%20170104.png)
 
 ### Create Lead Modal
-![Create Lead](./screenshots/create-lead.png)
+![Create Lead](https://github.com/Dutta-Raj/Smart_leads-/blob/main/Screenshot%202026-05-18%20170120.png)
 
 ### Filters & Search
-![Filters & Search](./screenshots/filters.png)
+![Filters & Search](https://github.com/Dutta-Raj/Smart_leads-/blob/main/Screenshot%202026-05-18%20170153.png)
 
 ### Admin Panel
-![Admin Panel](./screenshots/admin-panel.png)
+![Admin Panel](https://github.com/Dutta-Raj/Smart_leads-/blob/main/Screenshot%202026-05-18%20170205.png)
 
 ### CSV Export
-![CSV Export](./screenshots/csv-export.png)
+![CSV Export](https://github.com/Dutta-Raj/Smart_leads-/blob/main/Screenshot%202026-05-18%20170216.png)
 
 
 text
