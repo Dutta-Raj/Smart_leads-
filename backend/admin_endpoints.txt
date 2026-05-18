@@ -1,0 +1,125 @@
+﻿// ========== ADMIN MANAGEMENT ENDPOINTS ==========
+
+// Get all users (Admin only)
+app.get('/api/admin/users', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, error: 'Admin access required' });
+    }
+    
+    const users = await User.find({}, '-password'); // Exclude passwords
+    res.json({ success: true, data: users });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Create new admin (Only existing admins can do this)
+app.post('/api/admin/create-admin', authMiddleware, async (req, res) => {
+  try {
+    // Only existing admins can create new admins
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, error: 'Only admins can create new admins' });
+    }
+    
+    const { name, email, password } = req.body;
+    
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ success: false, error: 'User already exists' });
+    }
+    
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    const newAdmin = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role: 'admin'
+    });
+    await newAdmin.save();
+    
+    res.json({ 
+      success: true, 
+      message: 'New admin created successfully',
+      data: { id: newAdmin._id, name: newAdmin.name, email: newAdmin.email, role: newAdmin.role }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete user (Admin only with protection)
+app.delete('/api/admin/users/:id', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, error: 'Admin access required' });
+    }
+    
+    const userToDelete = await User.findById(req.params.id);
+    
+    if (!userToDelete) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+    
+    // Prevent deleting the last admin
+    const adminCount = await User.countDocuments({ role: 'admin' });
+    if (userToDelete.role === 'admin' && adminCount === 1) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Cannot delete the only admin. Create another admin first.' 
+      });
+    }
+    
+    // Prevent deleting system admin (optional protection)
+    if (userToDelete.email === 'masteradmin@system.com') {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Cannot delete system master admin' 
+      });
+    }
+    
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Change user role (Admin only)
+app.put('/api/admin/users/:id/role', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, error: 'Admin access required' });
+    }
+    
+    const { role } = req.body;
+    if (!['admin', 'sales'].includes(role)) {
+      return res.status(400).json({ success: false, error: 'Invalid role' });
+    }
+    
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+    
+    // Prevent removing last admin
+    if (user.role === 'admin' && role !== 'admin') {
+      const adminCount = await User.countDocuments({ role: 'admin' });
+      if (adminCount === 1) {
+        return res.status(403).json({ 
+          success: false, 
+          error: 'Cannot demote the only admin. Promote another user first.' 
+        });
+      }
+    }
+    
+    user.role = role;
+    await user.save();
+    
+    res.json({ success: true, message: 'User role updated', data: user });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});

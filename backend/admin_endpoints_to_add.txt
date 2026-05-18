@@ -1,0 +1,71 @@
+﻿// ========== ADMIN MANAGEMENT ENDPOINTS ==========
+
+// Get all users (Admin only)
+app.get('/api/admin/users', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, error: 'Admin access required' });
+    }
+    
+    const users = await User.find({}, '-password');
+    res.json({ success: true, data: users });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete user (Admin only)
+app.delete('/api/admin/users/:id', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, error: 'Admin access required' });
+    }
+    
+    const userToDelete = await User.findById(req.params.id);
+    
+    if (!userToDelete) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+    
+    // Prevent deleting yourself
+    if (userToDelete._id.toString() === req.user.id) {
+      return res.status(403).json({ success: false, error: 'Cannot delete your own account' });
+    }
+    
+    // Delete user's leads first
+    await Lead.deleteMany({ createdBy: req.params.id });
+    
+    // Delete user
+    await User.findByIdAndDelete(req.params.id);
+    
+    res.json({ success: true, message: 'User and their leads deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Change user role (Admin only)
+app.put('/api/admin/users/:id/role', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, error: 'Admin access required' });
+    }
+    
+    const { role } = req.body;
+    if (!['admin', 'sales'].includes(role)) {
+      return res.status(400).json({ success: false, error: 'Invalid role' });
+    }
+    
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+    
+    user.role = role;
+    await user.save();
+    
+    res.json({ success: true, message: 'User role updated', data: user });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});

@@ -1,0 +1,55 @@
+﻿// Update the registration endpoint - REPLACE this section in server.js
+
+// Register endpoint with security
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    console.log('Registration:', req.body.email);
+    const { name, email, password, role } = req.body;
+    
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ success: false, error: 'User already exists' });
+    }
+    
+    // SECURITY: Check if this is the first user
+    const userCount = await User.countDocuments();
+    let assignedRole = role;
+    
+    // If no users exist, this user becomes admin automatically
+    if (userCount === 0) {
+      assignedRole = 'admin';
+      console.log('First user registered as ADMIN automatically');
+    } else {
+      // For non-first users, force role to 'sales' regardless of what they selected
+      assignedRole = 'sales';
+      console.log(`New user ${email} registered as SALES (prevented admin registration)`);
+    }
+    
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role: assignedRole
+    });
+    await user.save();
+    
+    const token = jwt.sign({ id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET);
+    
+    res.json({ 
+      success: true, 
+      data: { 
+        id: user._id, 
+        name, 
+        email, 
+        role: user.role, 
+        token,
+        message: userCount === 0 ? 'Registered as Admin (First User)' : 'Registered as Sales User'
+      } 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
