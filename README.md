@@ -27,6 +27,33 @@ Admin User:
 Email: raj104@gmail.com
 Password: Admin@123
 
+## 📸 Screenshots
+
+### Login Page
+![Login Page](./screenshots/login.png)
+
+### Registration Page
+![Registration Page](./screenshots/register.png)
+
+### Dashboard - Light Mode
+![Dashboard Light](./screenshots/dashboard-light.png)
+
+### Dashboard - Dark Mode
+![Dashboard Dark](./screenshots/dashboard-dark.png)
+
+### Create Lead Modal
+![Create Lead](./screenshots/create-lead.png)
+
+### Filters & Search
+![Filters & Search](./screenshots/filters.png)
+
+### Admin Panel
+![Admin Panel](./screenshots/admin-panel.png)
+
+### CSV Export
+![CSV Export](./screenshots/csv-export.png)
+
+
 text
 
 ## 📋 Table of Contents
