@@ -9,9 +9,13 @@ dotenv.config();
 
 const app = express();
 
+// ========== UPDATED CORS CONFIGURATION ==========
+// Allow both local development and Netlify frontend
 app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true
+  origin: ['http://localhost:5173', 'https://dutta-smart-leads.netlify.app', 'https://*.netlify.app'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
@@ -278,10 +282,10 @@ app.get('/api/leads/export/csv', authMiddleware, async (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+  res.json({ status: 'ok', message: 'Server is running' });
 });
 
-// MongoDB connection
+// ========== MONGODB CONNECTION ==========
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('✅ MongoDB Connected');
