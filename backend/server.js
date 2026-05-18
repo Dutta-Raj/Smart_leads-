@@ -18,6 +18,20 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Smart Leads API is running!',
+    endpoints: {
+      health: 'GET /health',
+      register: 'POST /api/auth/register',
+      login: 'POST /api/auth/login',
+      leads: 'GET /api/leads'
+    }
+  });
+});
+
+
 // ========== MODELS ==========
 
 const userSchema = new mongoose.Schema({
@@ -332,3 +346,4 @@ const connectWithRetry = () => {
 };
 
 connectWithRetry();
+
