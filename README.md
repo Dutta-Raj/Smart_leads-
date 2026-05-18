@@ -1,86 +1,94 @@
+powershell
 cd C:\Users\KIIT\Desktop\smart-leads-dashboard
 
 # Create comprehensive README.md
 @'
 # 🚀 Smart Leads Dashboard
 
+> A production-ready full-stack lead management system built with the MERN stack
+
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen)](https://nodejs.org/)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)](https://www.mongodb.com/cloud/atlas)
 [![React](https://img.shields.io/badge/React-18.2.0-blue)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.2.2-blue)](https://www.typescriptlang.org/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.0-38B2AC)](https://tailwindcss.com/)
 
-A **production-ready** full-stack lead management system built with the MERN stack (MongoDB, Express.js, React, Node.js). Features JWT authentication, role-based access control, real-time lead management, and an intuitive dashboard.
+## 🌐 Live Demo
 
-## 📸 Screenshots
+| Service | URL |
+|---------|-----|
+| **Frontend Application** | [https://dutta-smart-leads.netlify.app](https://dutta-smart-leads.netlify.app) |
+| **Backend API** | [https://smart-leads-53ls.onrender.com](https://smart-leads-53ls.onrender.com) |
+| **GitHub Repository** | [https://github.com/Dutta-Raj/Smart_leads-](https://github.com/Dutta-Raj/Smart_leads-) |
 
-| Login Page | Dashboard | Admin Panel |
-|------------|-----------|-------------|
-| ![Login](https://via.placeholder.com/400x250?text=Login+Page) | ![Dashboard](https://via.placeholder.com/400x250?text=Dashboard) | ![Admin](https://via.placeholder.com/400x250?text=Admin+Panel) |
+### Test Credentials
+Admin User:
+Email: raj104@gmail.com
+Password: Admin@123
 
-## ✨ Live Demo
-
-> **Backend API:** `http://localhost:5000`  
-> **Frontend App:** `http://localhost:5173`
+text
 
 ## 📋 Table of Contents
-
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Architecture](#-architecture)
 - [Installation](#-installation)
 - [Environment Variables](#-environment-variables)
-- [Running the Application](#-running-the-application)
 - [API Documentation](#-api-documentation)
-- [Role-Based Access](#-role-based-access)
+- [Role-Based Access Control](#-role-based-access-control)
 - [Project Structure](#-project-structure)
 - [Deployment](#-deployment)
-- [Contributing](#-contributing)
-- [License](#-license)
 
-## 🎯 Features
+## ✨ Features
 
-### 🔐 Authentication & Security
-- JWT-based authentication with token expiration
-- Password hashing using bcrypt (10 rounds)
-- Protected routes with middleware
-- Role-based access control (Admin/Sales)
-- Session management with localStorage
-- Input validation and sanitization
+### 🔐 Authentication System
+- ✅ JWT-based authentication with token expiration
+- ✅ User registration & login
+- ✅ Password hashing using bcrypt (10 rounds)
+- ✅ Protected routes with auth middleware
+- ✅ Role-Based Access Control (Admin/Sales)
 
-### 📊 Lead Management
-- **Full CRUD operations** - Create, Read, Update, Delete leads
-- **Rich lead fields**: Name, Email, Status, Source, Timestamps
-- **Status tracking**: New → Contacted → Qualified → Lost
-- **Source tracking**: Website, Instagram, Referral
-- **Real-time updates** with auto-refresh
+### 📊 Lead Management (CRUD)
+- ✅ Create leads with name, email, status, source
+- ✅ Read all leads in responsive table
+- ✅ Update lead details
+- ✅ Delete leads (admin only)
+- **Lead Status:** New, Contacted, Qualified, Lost
+- **Lead Sources:** Website, Instagram, Referral
 
 ### 🔍 Advanced Filtering & Search
-- **Multi-filter support**: Combine status and source filters
-- **Debounced search** (500ms delay) for name/email
-- **Sorting options**: Latest first / Oldest first
-- **Backend pagination**: 10 records per page with metadata
-- **Empty states** and loading skeletons
+- ✅ Filter by Status
+- ✅ Filter by Source
+- ✅ Debounced search by Name or Email (500ms)
+- ✅ Sort by Latest/Oldest
+- ✅ Multiple filters work together
 
-### 🎨 Modern UI/UX
-- **Responsive design** - Works on desktop, tablet, and mobile
-- **Dark/Light mode** with system preference detection
-- **Smooth 2D animations** using Framer Motion
-- **Glass morphism effects** and gradient backgrounds
-- **Loading states** and error boundaries
-- **Toast notifications** for user actions
+### 📄 Pagination
+- ✅ Backend pagination with skip/limit
+- ✅ 10 records per page
+- ✅ Pagination metadata (total, page, totalPages)
 
-### 📤 Export & Reporting
-- **CSV export** with current filters applied
-- Download leads data for external analysis
-- Compatible with Excel, Google Sheets, and data tools
+### 🎨 Frontend UI/UX
+- ✅ Responsive design with TailwindCSS
+- ✅ Reusable React components
+- ✅ Loading & empty states
+- ✅ Error handling UI
+- ✅ Form validation with Zod
+- ✅ Dark/Light mode toggle
+- ✅ 2D animations with Framer Motion
+
+### 📤 Additional Features
+- ✅ CSV Export functionality
+- ✅ Role-Based Access Control
+- ✅ Docker ready configuration
+- ✅ Dark mode support
 
 ### 👥 Admin Panel
-- **User management dashboard**
-- Change user roles (Admin ↔ Sales)
-- Delete users with cascade delete (removes their leads)
-- Protected from self-deletion
-- Real-time user list refresh
+- ✅ View all registered users
+- ✅ Change user roles (Admin ↔ Sales)
+- ✅ Delete users with cascade delete
+- ✅ Protected from self-deletion
 
 ## 🛠️ Tech Stack
 
@@ -110,3 +118,74 @@ A **production-ready** full-stack lead management system built with the MERN sta
 | CORS | 2.8.5 | Cross-origin requests |
 
 ## 🏗️ Architecture
+┌─────────────────────────────────────────────────────────────┐
+│ Client Browser │
+│ ┌─────────────────────────────────────────────────────┐ │
+│ │ React SPA (Port 5173 / Netlify) │ │
+│ │ • TailwindCSS for styling │ │
+│ │ • Framer Motion for animations │ │
+│ │ • Context API for state management │ │
+│ └─────────────────┬───────────────────────────────────┘ │
+└────────────────────┼───────────────────────────────────────┘
+│ HTTPS / REST API
+▼
+┌─────────────────────────────────────────────────────────────┐
+│ Express Server (Port 10000 / Render) │
+│ ┌─────────────────────────────────────────────────────┐ │
+│ │ • JWT Authentication Middleware │ │
+│ │ • Role-Based Access Control │ │
+│ │ • Request Validation │ │
+│ │ • Error Handling │ │
+│ └─────────────────┬───────────────────────────────────┘ │
+└────────────────────┼───────────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────────┐
+│ MongoDB Atlas │
+│ ┌─────────────────────────────────────────────────────┐ │
+│ │ • users collection (authentication & roles) │ │
+│ │ • leads collection (lead management) │ │
+│ │ • Indexes for performance │ │
+│ └─────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+
+text
+
+## 💻 Installation
+
+### Prerequisites
+- Node.js (v14 or higher)
+- MongoDB Atlas account or local MongoDB
+- npm or yarn package manager
+- Git
+
+### Clone the Repository
+```bash
+git clone https://github.com/Dutta-Raj/Smart_leads-.git
+cd Smart_leads-
+Backend Setup
+bash
+cd backend
+npm install
+npm run dev
+Frontend Setup
+bash
+cd frontend
+npm install
+npm run dev
+🔧 Environment Variables
+Backend .env file
+env
+# Server Configuration
+PORT=5000
+NODE_ENV=development
+
+# MongoDB Atlas Connection
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/smart_leads
+
+# JWT Configuration
+JWT_SECRET=your_super_secret_key_here
+JWT_EXPIRE=7d
+
+# Security
+BCRYPT_ROUNDS=10
