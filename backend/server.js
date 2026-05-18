@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -9,8 +9,7 @@ dotenv.config();
 
 const app = express();
 
-// ========== UPDATED CORS CONFIGURATION ==========
-// Allow both local development and Netlify frontend
+// ========== CORS CONFIGURATION ==========
 app.use(cors({
   origin: ['http://localhost:5173', 'https://dutta-smart-leads.netlify.app', 'https://*.netlify.app'],
   credentials: true,
@@ -69,12 +68,16 @@ app.post('/api/auth/register', async (req, res) => {
     }
     
     const adminExists = await User.findOne({ role: 'admin' });
-    let assignedRole = role || 'sales';
+    let assignedRole = 'sales';
     
-    if (!adminExists && assignedRole === 'admin') {
+    if (!adminExists) {
       assignedRole = 'admin';
-    } else if (assignedRole === 'admin') {
+      console.log(`?? First user registered as ADMIN: ${email}`);
+    } else if (role === 'admin') {
       assignedRole = 'sales';
+      console.log(`?? User ${email} tried to register as admin but was assigned sales`);
+    } else {
+      assignedRole = role || 'sales';
     }
     
     const salt = await bcrypt.genSalt(10);
@@ -90,8 +93,19 @@ app.post('/api/auth/register', async (req, res) => {
     
     const token = jwt.sign({ id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET);
     
-    res.json({ success: true, data: { id: user._id, name, email, role: user.role, token } });
+    res.json({ 
+      success: true, 
+      data: { 
+        id: user._id, 
+        name, 
+        email, 
+        role: user.role, 
+        token,
+        message: assignedRole === 'admin' ? 'Registered as Admin (First User)' : 'Registered as Sales User'
+      } 
+    });
   } catch (error) {
+    console.error('Registration error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -101,13 +115,28 @@ app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ success: false, error: 'Invalid credentials' });
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'User not found' });
+    }
+    
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ success: false, error: 'Invalid password' });
     }
     
     const token = jwt.sign({ id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET);
-    res.json({ success: true, data: { id: user._id, name: user.name, email, role: user.role, token } });
+    res.json({ 
+      success: true, 
+      data: { 
+        id: user._id, 
+        name: user.name, 
+        email, 
+        role: user.role, 
+        token 
+      } 
+    });
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -134,7 +163,6 @@ app.delete('/api/admin/users/:id', authMiddleware, async (req, res) => {
     }
     
     const userToDelete = await User.findById(req.params.id);
-    
     if (!userToDelete) {
       return res.status(404).json({ success: false, error: 'User not found' });
     }
@@ -282,19 +310,25 @@ app.get('/api/leads/export/csv', authMiddleware, async (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Server is running' });
+  res.json({ status: 'ok', message: 'Server is running', timestamp: new Date().toISOString() });
 });
 
-// ========== MONGODB CONNECTION ==========
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('✅ MongoDB Connected');
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+// ========== MONGODB CONNECTION WITH RETRY ==========
+const connectWithRetry = () => {
+  console.log('?? Connecting to MongoDB...');
+  mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+      console.log('? MongoDB Connected Successfully!');
+      const PORT = process.env.PORT || 5000;
+      app.listen(PORT, () => {
+        console.log(`?? Server running on http://localhost:${PORT}`);
+      });
+    })
+    .catch(err => {
+      console.error('? MongoDB Connection Error:', err.message);
+      console.log('?? Retrying connection in 5 seconds...');
+      setTimeout(connectWithRetry, 5000);
     });
-  })
-  .catch(err => {
-    console.error('❌ MongoDB Error:', err.message);
-    process.exit(1);
-  });
+};
+
+connectWithRetry();
