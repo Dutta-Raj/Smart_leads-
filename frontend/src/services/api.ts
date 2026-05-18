@@ -1,8 +1,10 @@
 ﻿import axios from 'axios';
 import toast from 'react-hot-toast';
 
+const API_URL = 'https://smart-leads-backend.onrender.com/api';
+
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },

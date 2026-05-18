@@ -42,3 +42,6 @@ frontend/.vite/
 
 # MongoDB files
 dump/
+
+# Local Netlify folder
+.netlify
